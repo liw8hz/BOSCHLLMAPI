@@ -15,7 +15,9 @@ class BoschApiClient:
         tenant_or_directory_id: str,
         api_url: str = "https://aigc.bosch.com.cn/llmservice/api/v1/chat/messages",
         model_name: str = "gpt4o-mini",
-        temperature: float = 0.1
+        temperature: float = 0.1,
+        top_k: int = 40,
+        top_p: float = 0.9
     ):
         """
         :param oauth2_client_id: Client ID of the Azure App Registration
@@ -31,6 +33,8 @@ class BoschApiClient:
         self.api_url = api_url
         self.model_name = model_name
         self.temperature = temperature
+        self.top_k = top_k
+        self.top_p = top_p
 
     def get_access_token(self) -> str:
         """

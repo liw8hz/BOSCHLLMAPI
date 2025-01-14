@@ -1,10 +1,10 @@
-from langchain.schema import HumanMessage
+from langchain.schema import HumanMessage, SystemMessage
 from Bosch_langchain_llm import BoschChatLLM
 
 def main():
-    tenant_id = "0ae51e19-07c8-4e4b-bb6d-648ee58410f4"
+    tenant_id = "0ae51e19-ssss-bbbb-wwww-648ee58410f4"
     oauth_data = {
-        "client_id": "00eed4c4-a3fb-4efb-b87e-8cea022e248c",
+        "client_id": "00eed4c4-zzzz-xxxx-b87e-8cea022e248c",
         "client_secret": "4Bk8Q~qNMZvtoJXXb1v_XDp~xV_giKEzWmKQHcaK"
     }
 
@@ -17,11 +17,16 @@ def main():
         tenant_or_directory_id=tenant_id,
         api_url=api_url, 
         model_name="gpt4o-mini",        # 接口里使用的模型名称
-        temperature=0.1
+        temperature=0.1,
+        top_k=40,
+        top_p=0.9
     )
 
     # 给模型发送一个 user 消息
-    messages = [HumanMessage(content="Who are you?")]
+    messages = [
+        SystemMessage(content="请将以下内容从英文翻译成中文:"),
+        HumanMessage(content="What did you say?")
+        ]
     # 打印回复
     result = llm.invoke(messages)
     print(result.content)

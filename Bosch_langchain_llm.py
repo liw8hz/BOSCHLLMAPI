@@ -31,6 +31,8 @@ class BoschChatLLM(BaseChatModel):
     ...     api_url="https://aigc.bosch.com.cn/llmservice/api/v1/chat/messages",
     ...     model_name="gpt4o-mini",
     ...     temperature=0.1
+    ...     top_k=40,
+    ...     top_p=0.9
     ... )
     >>> messages = [HumanMessage(content="Who are you?")]
     >>> result = llm.invoke(messages)
@@ -47,6 +49,8 @@ class BoschChatLLM(BaseChatModel):
         api_url: str,
         model_name: str = "gpt4o-mini",
         temperature: float = 0.1,
+        top_k: int = 40,
+        top_p: float = 0.9,
         **kwargs: Any
     ):
         
@@ -63,7 +67,9 @@ class BoschChatLLM(BaseChatModel):
                 tenant_or_directory_id=tenant_or_directory_id,
                 api_url=api_url,
                 model_name=model_name,
-                temperature=temperature
+                temperature=temperature,
+                top_k=top_k,
+                top_p=top_p
             )
         )
 
