@@ -7,10 +7,10 @@ from urllib3.exceptions import InsecureRequestWarning
 warnings.filterwarnings("ignore", category=InsecureRequestWarning)
 
 def main():
-    tenant_id = "0ae51e19-aaaa-bbbb-cccc-648ee58410f4"
+    tenant_id = "0ae51e19-07c8-4e4b-bb6d-648ee58410f4"
     oauth_data = {
-        "client_id": "00eed4c4-xxxx-yyyy-b87e-8cea022e248c",
-        "client_secret": "xxxxx"
+        "client_id": "00eed4c4-a3fb-4efb-b87e-8cea022e248c",
+        "client_secret": "Il68Q~hdQaSsb2Vyzt5ZuXsgS2SDFSgpEhwVFbwj"
     }
 
     # LLM API 配置
@@ -30,7 +30,7 @@ def main():
     # 给模型发送一个 user 消息
     messages = [
         SystemMessage(content="请回答如实回答下面的问题，不能有臆造和不实的信息："),
-        HumanMessage(content="假设有一个池塘，里面有无穷多的水。现有2个空水壶，容积分别为5升和6升。问题是如何只用这2个水壶从池塘里取得3升的水。")
+        HumanMessage(content="如何将大象放入冰箱？")
         ]
     # 打印回复
     result = llm.invoke(messages)
