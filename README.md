@@ -34,3 +34,6 @@ pip install requests pydantic langchain
 # 许可证
 示例代码可参考 MIT 开源协议使用和修改。
 
+# History
+2025.02.14: Updated code for deepseek-v3 and deepseek-R1, add reasoning thinking content if module is deepseek-R1
+
