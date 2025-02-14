@@ -30,7 +30,6 @@ pip install requests pydantic langchain
 
 配置你的 Azure AD / API 信息
 在 Demo.py（或类似脚本）里，填写正确的 oauth2_client_id, oauth2_client_secret, tenant_or_directory_id（通常是租户 ID 或 GUID），以及调用的 api_url（通常为聊天接口地址）。
-![alt text](image.png)
 
 # 许可证
 示例代码可参考 MIT 开源协议使用和修改。
