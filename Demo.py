@@ -7,10 +7,10 @@ from urllib3.exceptions import InsecureRequestWarning
 warnings.filterwarnings("ignore", category=InsecureRequestWarning)
 
 def main():
-    tenant_id = "0ae51e19-07c8-4e4b-bb6d-648ee58410f4"
+    tenant_id = "0ae51e19-aaaa-bbbb-cccc-648ee58410f4"
     oauth_data = {
-        "client_id": "00eed4c4-a3fb-4efb-b87e-8cea022e248c",
-        "client_secret": "Il68Q~hdQaSsb2Vyzt5ZuXsgS2SDFSgpEhwVFbwj"
+        "client_id": "00eed4c4-xxxx-yyyy-zzzz-8cea022e248c",
+        "client_secret": "xxxxxxxx"
     }
 
     # LLM API 配置
