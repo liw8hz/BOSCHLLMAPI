@@ -110,12 +110,23 @@ class BoschChatLLM(BaseChatModel):
             # 2. call actual API
             response_json = self._client.chat(transformed_messages)
             # The successful response format from the API is:
+            # a format:
             # {
             #   "msg": "Operation Success",
             #   "code": 200,
             #   "data": {
             #       "messages": [
             #           {"role": "assistant", "content": "..."}
+            #       ]
+            #   }
+            # }
+            # b format:
+            # {
+            #   "msg": "Operation Success",
+            #   "code": 200,
+            #   "data": {
+            #       "messages": [
+            #           {"role": "assistant", "content": "...", "reasoning_content": "..."}
             #       ]
             #   }
             # }
@@ -131,6 +142,11 @@ class BoschChatLLM(BaseChatModel):
                 for item in response_json["data"]["messages"]:
                     if item.get("role") == "assistant":
                         assistant_content = item.get("content", "")
+                        assistant_content = str(assistant_content).replace('\n\n', '\n')
+                        # Check for reasoning_content in b format
+                        reasoning_content = item.get("reasoning_content", "")
+                        if reasoning_content:
+                            assistant_content += f"\n\n <Thinking> \n\n {reasoning_content} \n </Thinking>"
                         break
 
             # 3. Wrap the results into LangChain's ChatResult:

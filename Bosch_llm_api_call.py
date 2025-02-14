@@ -1,7 +1,10 @@
-
-
+import warnings
 import requests
 from typing import Dict, List, Any
+
+# Suppress only the single InsecureRequestWarning from urllib3 needed
+from urllib3.exceptions import InsecureRequestWarning
+warnings.filterwarnings("ignore", category=InsecureRequestWarning)
 
 class BoschApiClient:
     """
@@ -83,6 +86,13 @@ class BoschApiClient:
             "Content-Type": "application/json"
         }
 
-        resp = requests.post(url, json=payload, headers=headers, verify=False)
+        if self.model_name == 'deepseek-r1':
+            print('Waiting feedback from AI...')
+            resp = requests.post(url, json=payload, headers=headers, verify=False, timeout=600)
+        else:
+            print('Waiting feedback from AI...')
+            resp = requests.post(url, json=payload, headers=headers, verify=False, timeout=60)
         resp.raise_for_status()
         return resp.json()
+    
+
