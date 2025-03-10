@@ -13,7 +13,8 @@
 main/
 ├── Bosch_llm_api_call.py        # 封装了实际的 API 调用和 Token 获取
 ├── Bosch_langchain_llm.py       # 继承 LangChain BaseChatModel 的自定义 LLM
-├── Demo.py                    # 演示如何使用自定义 LLM
+├── Demo.py
+├── Demo_internal.py           # 演示如何使用自定义 LLM, internal和call cloud platform
 └── README.md                  # 项目说明文档
 ```
 # 依赖
@@ -36,4 +37,5 @@ pip install requests pydantic langchain
 
 # History
 2025.02.14: Updated code for deepseek-v3 and deepseek-R1, add reasoning thinking content if module is deepseek-R1
+2025.03.10: Update new class for DeepSeek-R1-Distill-Llama-70B API in internal API platform, Demo_internal.py for how to use it
 

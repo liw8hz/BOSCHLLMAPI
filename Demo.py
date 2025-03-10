@@ -1,4 +1,5 @@
 import warnings
+import time
 from langchain.schema import HumanMessage, SystemMessage
 from Bosch_langchain_llm import BoschChatLLM
 
@@ -6,11 +7,25 @@ from Bosch_langchain_llm import BoschChatLLM
 from urllib3.exceptions import InsecureRequestWarning
 warnings.filterwarnings("ignore", category=InsecureRequestWarning)
 
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        print(f"Execution time: {end_time - start_time} seconds")
+        return result
+    return wrapper
+
+prompt_template = "You are useful assistance. "
+
+my_contents = "9.8和9.11哪个更大？"
+
+@timeit
 def main():
-    tenant_id = "0ae51e19-aaaa-bbbb-cccc-648ee58410f4"
+    tenant_id = "0ae51e19-xxxx-xxxx-xxxx-648ee58410f4"
     oauth_data = {
-        "client_id": "00eed4c4-xxxx-yyyy-zzzz-8cea022e248c",
-        "client_secret": "xxxxxxxx"
+        "client_id": "00eed4c4-xxxx-xxxx-xxxx-8cea022e248c",
+        "client_secret": "your secret here"
     }
 
     # LLM API 配置
@@ -21,17 +36,18 @@ def main():
         oauth2_client_secret=oauth_data["client_secret"],
         tenant_or_directory_id=tenant_id,
         api_url=api_url, 
-        model_name="deepseek-r1",        # 接口里使用的模型名称
-        temperature=0.6,
+        model_name="gpt4o-mini",        # 接口里使用的模型名称
+        temperature=0.1,
         top_k=5,
         top_p=0.6
     )
 
     # 给模型发送一个 user 消息
     messages = [
-        SystemMessage(content="请回答如实回答下面的问题，不能有臆造和不实的信息："),
-        HumanMessage(content="如何将大象放入冰箱？")
+        SystemMessage(content=prompt_template),
+        HumanMessage(content=my_contents)
         ]
+    
     # 打印回复
     result = llm.invoke(messages)
     print(result.content)

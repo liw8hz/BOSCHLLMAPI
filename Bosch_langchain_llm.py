@@ -13,7 +13,7 @@ from langchain.schema import (
     BaseMessage
 )
 
-from Bosch_llm_api_call import BoschApiClient
+from Bosch_llm_api_call import BoschApiClient, BoschApiClient_internal
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +156,125 @@ class BoschChatLLM(BaseChatModel):
             ai_message = AIMessage(content=assistant_content)
             generation = ChatGeneration(message=ai_message)
             print(f"[DEBUG msg] : msg: {response_json['msg']} || code:{response_json['code']}")
+            return ChatResult(generations=[generation])
+
+        except requests.exceptions.RequestException as e:
+            logger.exception("Error calling BoschAI Chat API: %s", e)
+            # Custom error handling can be implemented as needed.
+            ai_message = AIMessage(content="(Error: Unable to get response from BoschAI.)")
+            generation = ChatGeneration(message=ai_message)
+            return ChatResult(generations=[generation])
+
+class BoschChatLLM_internal(BaseChatModel):
+    """
+    Custom Chat LLM Compatible with LangChain for the new API interface.
+    
+    How to use：
+    
+    >>> from Bosch_langchain_llm import BoschChatLLM_internal
+    >>> llm = BoschChatLLM_internal(
+    ...     api_key="xxx",
+    ...     api_url="https://blue-whale-msp.de.bosch.com/api/chat/completions",
+    ...     model_name="deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+    ...     temperature=0.1
+    ... )
+    >>> messages = [HumanMessage(content="Who are you?")]
+    >>> result = llm.invoke(messages)
+    >>> print(result.content)
+    """
+    # Use Pydantic's PrivateAttr to store internal fields that do not require model validation/serialization.
+    _client: BoschApiClient_internal = PrivateAttr()
+
+    def __init__(
+        self,
+        api_key: str,
+        api_url: str,
+        model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+        temperature: float = 0.1,
+        **kwargs: Any
+    ):
+        
+        # Allow Pydantic (LangChain's BaseChatModel) to perform standard initialization first.
+        super().__init__(**kwargs)
+
+        # Use `object.__setattr__` to assign values to private attributes, avoiding conflicts with Pydantic fields.
+        object.__setattr__(
+            self,
+            "_client",
+            BoschApiClient_internal(
+                api_key=api_key,
+                api_url=api_url,
+                model_name=model_name,
+                temperature=temperature
+            )
+        )
+
+    @property
+    def _llm_type(self) -> str:
+        """
+        Returns an identifier to distinguish between different types of LLMs.
+        """
+        return "Bosch_ai_llm_internal"
+
+    def _generate(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        **kwargs: Any
+    ) -> ChatResult:
+        """
+        Core message generation logic: pass in a list of ChatMessage objects, call the custom API to get a response.
+        Returns a ChatResult as defined in LangChain.
+        """
+
+        # 1. Convert LangChain's message format to the API's required format:
+        #    LangChain: SystemMessage/HumanMessage/AIMessage ...
+        #    API requires: {"role": "user", "content": "..."} or {"role": "assistant", "content": "..."} etc.
+        transformed_messages = []
+        for m in messages:
+            if isinstance(m, HumanMessage):
+                role = "user"
+            elif isinstance(m, AIMessage):
+                role = "assistant"
+            elif isinstance(m, SystemMessage):
+                role = "system"
+            else:
+                role = "user"  # fallback
+            transformed_messages.append({"role": role, "content": m.content})
+
+        try:
+            # 2. call actual API
+            response_json = self._client.chat(transformed_messages)
+            # The successful response format from the API is:
+            # {
+            #   "choices": [
+            #       {
+            #           "message": {
+            #               "role": "assistant",
+            #               "content": "..."
+            #           }
+            #       }
+            #   ]
+            # }
+            assistant_content = ""
+            if (
+                response_json
+                and "choices" in response_json
+                and isinstance(response_json["choices"], list)
+                and len(response_json["choices"]) > 0
+            ):
+                # Get the first assistant message is OK
+                for item in response_json["choices"]:
+                    if item.get("message", {}).get("role") == "assistant":
+                        assistant_content = item.get("message", {}).get("content", "")
+                        break
+
+            # 3. Wrap the results into LangChain's ChatResult:
+            #    ChatGeneration can be understood as an object representing "a single chat generation."
+            #    ChatResult.generations is a list containing ChatGeneration objects.
+            #    ChatGeneration includes an AIMessage.
+            ai_message = AIMessage(content=assistant_content)
+            generation = ChatGeneration(message=ai_message)
             return ChatResult(generations=[generation])
 
         except requests.exceptions.RequestException as e:

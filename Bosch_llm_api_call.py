@@ -86,7 +86,7 @@ class BoschApiClient:
             "Content-Type": "application/json"
         }
 
-        if self.model_name == 'deepseek-r1':
+        if self.model_name == 'deepseek-r1' or self.model_name == 'deepseek-v3':
             print('Waiting feedback from AI...')
             resp = requests.post(url, json=payload, headers=headers, verify=False, timeout=600)
         else:
@@ -94,5 +94,60 @@ class BoschApiClient:
             resp = requests.post(url, json=payload, headers=headers, verify=False, timeout=60)
         resp.raise_for_status()
         return resp.json()
-    
+
+class BoschApiClient_internal:
+    """
+    Client wrapper for calling the new chat messages API.
+    """
+
+    def __init__(
+        self,
+        api_key: str,
+        api_url: str = "https://blue-whale-msp.de.bosch.com/api/chat/completions",
+        model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B",
+        temperature: float = 0.1
+    ):
+        """
+        :param api_key: API key for authentication
+        :param api_url: URL of the chat messages API
+        :param model_name: Default model name for sending requests
+        :param temperature: Default temperature for sending requests
+        """
+        self.api_key = api_key
+        self.api_url = api_url
+        self.model_name = model_name
+        self.temperature = temperature
+
+    def chat(
+        self, 
+        messages: List[Dict[str, str]],
+        model_name: str = None,
+        temperature: float = None
+    ) -> Dict[str, Any]:
+        """
+        Calls the new chat messages API to send chat messages.
+
+        :param messages: In the format [{"role": "user", "content": "hello"}]
+        :param model_name: Optional, specifies the model; uses the default if not provided
+        :param temperature: Optional, specifies the temperature; uses the default if not provided
+        :return: JSON structure returned by the API
+        """
+        url = self.api_url
+
+        payload = {
+            "messages": messages,
+            "model": model_name if model_name else self.model_name,
+            "temperature": temperature if temperature is not None else self.temperature
+        }
+
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "accept": "application/json",
+            "Content-Type": "application/json"
+        }
+
+        resp = requests.post(url, headers=headers, json=payload, verify=False, stream=True)
+        resp.raise_for_status()
+        return resp.json()
+
 
