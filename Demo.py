@@ -22,9 +22,9 @@ my_contents = "9.8和9.11哪个更大？"
 
 @timeit
 def main():
-    tenant_id = "0ae51e19-xxxx-xxxx-xxxx-648ee58410f4"
+    tenant_id = "your tenant ID"
     oauth_data = {
-        "client_id": "00eed4c4-xxxx-xxxx-xxxx-8cea022e248c",
+        "client_id": "your oauth ID",
         "client_secret": "your secret here"
     }
 
